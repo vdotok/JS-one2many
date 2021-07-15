@@ -131,7 +131,7 @@ export class CallComponent implements OnInit {
       }
     });
 
-    this.vdkCallService.Client.on("groupCall", response => {
+    this.vdkCallService.Client.on("call", response => {
       console.error("groupCall response", response);
       switch (response.type) {
         case "CALL_RECEIVED":
@@ -141,17 +141,9 @@ export class CallComponent implements OnInit {
           this.calling.call_type = response.call_type;
           this.changeDetector.detectChanges();
           break;
-        // case "NEW_PARTICIPANT":
-        //this.calling.templateName = this.calling.call_type == 'video' ? 'groupVideoCall' : 'groupOngoingAudioCall';
-        // this.groupOutgoingVideoCall = false;
-        // this.addParticipant(response);
-        // break;
-        case "PARTICIPANT_LEFT":
-          this.removeParticipant(response);
-          break;
-        case "PARTICIPANT_STATUS":
+        case "CALL_STATUS":
           const displaystyle = response.video_status ? 'block' : 'none';
-          if (document.getElementById(response.participant)) document.getElementById(response.participant).style.display = displaystyle;
+          if (document.getElementById('remoteVideo')) document.getElementById('remoteVideo').style.display = displaystyle;
           break;
       }
     });
@@ -250,7 +242,7 @@ export class CallComponent implements OnInit {
   rejectedCall() {
     this.calling.templateName = 'noCall';
     this.changeDetector.detectChanges();
-    this.vdkCallService.Client.leaveGroupCall();
+    this.vdkCallService.leaveGroupCall();
   }
 
   resetCall() {
@@ -289,7 +281,7 @@ export class CallComponent implements OnInit {
     setTimeout(() => {
       this.changeDetector.detectChanges();
       this.groupOutgoingVideoCall = false;
-      const localVideo = document.getElementById("BroadCastLocalVideo");
+      const localVideo = document.getElementById("remoteVideo");
       this.vdkCallService.AcceptBroadcast(localVideo);
       this.changeDetector.detectChanges();
     });
@@ -409,8 +401,14 @@ export class CallComponent implements OnInit {
     if (!this.isValidFeatureSelection()) {
       return;
     }
-    this.creatingyourURL = false;
-    this.StartBroadcast = true;
+    // this.creatingyourURL = false;
+    // this.StartBroadcast = true;
+    setTimeout(() => {
+      this.calling.templateName = 'videoPublicBroadcast';
+      setTimeout(() => {
+        this.broadCast();
+      });
+    }, 2000);
   }
 
   isValidFeatureSelection() {

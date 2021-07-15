@@ -60,9 +60,9 @@
       </div>
     </div>
     <ng-container [ngTemplateOutlet]="selectedTemplate"></ng-container>
-    <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
+    <!-- <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
       <source src="" type="video/mp4" />
-    </video>
+    </video> -->
   </div>
 </div>
 
@@ -199,9 +199,6 @@
       <div style="width: 200px;" class="callButtonsContainer">
         <img src="./assets/images/Accept-button.png" class="responseButtonImg" (click)="acceptcall()" />
         <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
-        <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
-          class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-        <!-- <img src="./assets/images/speaker-on.png" class="responseButtonImg" /> -->
       </div>
     </div>
   </div>
@@ -209,15 +206,12 @@
 
 <ng-template #groupVideoCall>
   <div style="border-radius: 0px" class="messagesBox noPadding">
-
     <div class="groupCallContainer " [ngClass]="groupOutgoingVideoCall ? 'noCallBackground' : ''">
       <div class="upperVideoContainer">
-
         <div class="conditionalName" *ngIf="groupOutgoingVideoCall">
           <p class="callContainerStatus">Calling</p>
           <p class="callerName text-capitalize">{{ calling.callerName }}</p>
         </div>
-
         <!-- during call top view start-->
         <div class="singleParticipantContainer" *ngFor="let user of calling.participant">
           <div class="singleInner">
@@ -294,14 +288,13 @@
 <ng-template #videoPublicBroadcast>
   <div class="messagesBox">
     <div class="callContainer">
-      <p class="callContainerStatus" *ngIf="!calling.participant.length">Initiating Public Broadcast11</p>
-      <p class="callContainerStatus" *ngIf="calling.participant.length"> Public Broadcast</p>
-
+      <p class="callContainerStatus" *ngIf="!calling.participant.length">Initiating Public Broadcast 11</p>
+      <p class="callContainerStatus" *ngIf="calling.participant.length"> Public Broadcast ddd</p>
       <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
       <div class="groupVideoCallWrapperBlock">
-        <!-- <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
+        <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
           <source src="" type="video/mp4" />
-        </video> -->
+        </video>
       </div>
       <div style="width: 200px;" class="callButtonsContainer">
         <img src="./assets/images/video-call-{{settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
@@ -310,7 +303,6 @@
         <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
           class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
       </div>
-
     </div>
   </div>
 </ng-template>
@@ -325,9 +317,9 @@
 
       <div class="groupVideoCallWrapperBlock"
         [ngClass]="groupOutgoingVideoCall ? 'groupVideoCallWrapper_noCall ' : 'groupVideoCallWrapper_Call'">
-        <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
+        <!-- <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
           <source src="" type="video/mp4" />
-        </video>
+        </video> -->
       </div>
 
       <div style="width: 150px;" class="callButtonsContainer">
@@ -345,6 +337,7 @@
     <div class="callContainer">
       <p class="callContainerStatus">Public Broadcast</p>
       <div>
+        <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
         <div class="groupVideoCallWrapperBlock">
           <video id="remoteVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
             <source src="" type="video/mp4" />

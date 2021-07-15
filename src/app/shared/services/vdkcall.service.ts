@@ -8,7 +8,7 @@ export class VdkCallService {
   constructor() { }
 
   public initConfigure(): void {
-    this.Client = new CVDOTOK.ManyToMany({
+    this.Client = new CVDOTOK.Client({
       projectID: "15Q89R",
       secret: "3d9686b635b15b5bc2d19800407609fa",
     });

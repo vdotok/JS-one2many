@@ -1592,7 +1592,7 @@ p {
 .chatPopupContent {
   background-color: white;
   border-radius: 20px;
-  min-height: 200px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

@@ -46,7 +46,7 @@
     <div class="leftSideFooter">
       <div class="logoutContainer" (click)="logout()">
         <img src="./assets/images/log-out.png" class="logoutLogo" />
-        <span class="logoutText">LOG OUT {{currentUserData.full_name}}</span>
+        <span class="logoutText">LOG OUT {{currentUserData.full_name}} ....{{ calling.templateName }}</span>
         <span class="ml-1" [ngClass]="sdkconnected ? 'online' :'offline' "></span>
       </div>
     </div>
@@ -55,14 +55,15 @@
     <div class="rightSideHeader alignBottom chatholder">
       <div style="display: flex;flex-direction: row;align-items: center">
         <img src="./assets/images/arrow-left.png" class="arrowLeft hand" (click)="backScreen()" *ngIf="isMobile()" />
-        <p class="roomNameText text-capitalize" *ngIf="activeChat.chatTitle">{{activeChat.chatTitle}}
+        <p class="roomNameText text-capitalize" *ngIf="activeChat.chatTitle && !inCall()">
+          {{activeChat.chatTitle}}
         </p>
+      </div>
+      <div class="btn btn-success" (click)="copyText()" *ngIf="PUBLIC_URL">Copy URL</div>
+      <div class="btn btn-danger" (click)="stopCall()" *ngIf="calling.templateName =='receiverBroadcastCall' ">End Call
       </div>
     </div>
     <ng-container [ngTemplateOutlet]="selectedTemplate"></ng-container>
-    <!-- <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
-      <source src="" type="video/mp4" />
-    </video> -->
   </div>
 </div>
 
@@ -74,7 +75,7 @@
         <div class="emptyListContainer">
           <div class="emptyListTop">
             <div class="noConvoTextWrapper">
-              <p class="noConvoText">Available Features ....{{ isValidFeatureSelection() }}....{{ StartBroadcast }}</p>
+              <p class="noConvoText">Available Features </p>
 
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="PublicBroadcast" id="PublicBroadcast"
@@ -92,15 +93,14 @@
             </div>
           </div>
           <div class="emptyListBottom mt-3">
-
             <ng-container *ngFor="let item of broadcastSettings.features;index as i">
               <button type="button" class="btn newChatButton" (click)="selectFeature(i)"
                 [ngClass]="item.selected ? 'bg-warning' :''">
                 {{ item.title }}
               </button>
             </ng-container>
-
-            <button class="px-4" type="submit" (click)="submitFeatures()"
+            <button class="px-4" type="submit"
+              (click)="broadcastSettings.broadcastType == 'PublicBroadcast' ? submitFeatures() : broadCast()"
               [ngClass]="isValidFeatureSelection() ? 'btn btn-success' :'btn btn-secondary' ">
               continue
             </button>
@@ -126,7 +126,6 @@
         <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
         <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
           class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-        <!-- <img src="./assets/images/speaker-on.png" class="responseButtonImg" /> -->
       </div>
     </div>
   </div>
@@ -142,7 +141,6 @@
         <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
         <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
           class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-        <!-- <img src="./assets/images/speaker-on.png" class="responseButtonImg" /> -->
       </div>
     </div>
   </div>
@@ -188,12 +186,12 @@
   </div>
 </ng-template>
 
-<!-- video call -->
-<ng-template #groupIncommingVideoCall>
+
+<ng-template #IncommingBroadcastCall>
   <div class="messagesBox">
     <div class="callContainer">
       <audio id="audiotag1" autoplay src="./assets/images/calling_you.mp3" preload="auto"></audio>
-      <p class="callContainerStatus">Incomming Call From</p>
+      <p class="callContainerStatus">Incomming Broadcast Call From</p>
       <p class="callerName text-capitalize">{{ calling.callerName }}</p>
       <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
       <div style="width: 200px;" class="callButtonsContainer">
@@ -204,63 +202,65 @@
   </div>
 </ng-template>
 
-<ng-template #groupVideoCall>
-  <div style="border-radius: 0px" class="messagesBox noPadding">
-    <div class="groupCallContainer " [ngClass]="groupOutgoingVideoCall ? 'noCallBackground' : ''">
-      <div class="upperVideoContainer">
-        <div class="conditionalName" *ngIf="groupOutgoingVideoCall">
-          <p class="callContainerStatus">Calling</p>
-          <p class="callerName text-capitalize">{{ calling.callerName }}</p>
-        </div>
-        <!-- during call top view start-->
-        <div class="singleParticipantContainer" *ngFor="let user of calling.participant">
-          <div class="singleInner">
-            <div class="groupVideoCallWrapper groupVideoCallWrapperBlock">
-              <video [id]="user.ref_id" autoplay muted style="object-fit: contain; height: 100%;
-              width: 100%;" autoplay>
-                <source src="" type="video/mp4" />
-              </video>
-            </div>
-            <img src="./assets/images/blue-avatar.png" class="singleInnAvatar" />
-            <p class="innerCallerName">{{ user.full_name }}</p>
-          </div>
-        </div>
-        <!-- during call top view end-->
+<!-- broadcast -->
+
+<ng-template #videoPublicBroadcast1>
+  <div class="messagesBox">
+    <div class="callContainer">
+      <p class="callContainerStatus" *ngIf="!calling.participant.length">Initiating Public Broadcast 11</p>
+      <p class="callContainerStatus" *ngIf="calling.participant.length"> Public Broadcast ddd</p>
+      <img src="./assets/images/blue-avatar.png" class="avatarIcon hand" (click)="copyText()" />
+
+      <div class="groupVideoCallWrapperBlock">
+        <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
+          <source src="" type="video/mp4" />
+        </video>
       </div>
-      <div class="bottomVideoContainer " [ngClass]="groupOutgoingVideoCall ? 'noCallBackground' : ''">
-        <div class="localVideoContainer">
-          <div style="margin-bottom: 50px" class="singleInner">
-            <!-- if video got sorce it will automatically view on top of name and avatar -->
-            <div class="groupVideoCallWrapperBlock"
-              [ngClass]="groupOutgoingVideoCall ? 'groupVideoCallWrapper_noCall ' : 'groupVideoCallWrapper_Call'">
-              <video id="localVideo2" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
-                <source src="" type="video/mp4" />
-              </video>
-            </div>
-
-            <div class="singleInner" id="localNameHolder">
-              <img src="./assets/images/blue-avatar.png" class="singleInnAvatar" />
-              <p class="innerCallerName text-capitalize">{{ currentUserData.full_name }}</p>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="groupCallControllContainer">
-          <div style="width: 200px;" class="callButtonsContainer">
-            <img src="./assets/images/video-call-{{ settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
-              class="responseButtonImg" (click)="changeSettings('isOnInProgressCamara')" />
-            <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
-            <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
-              class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-            <!-- <img src="./assets/images/speaker-on.png" class="responseButtonImg" /> -->
-          </div>
-        </div>
-
+      <div style="width: 200px;" class="callButtonsContainer">
+        <img src="./assets/images/video-call-{{settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
+          class="responseButtonImg" (click)="changeSettings('isOnInProgressCamara')" />
+        <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
+        <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
+          class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
       </div>
     </div>
   </div>
 </ng-template>
+
+<ng-template #receiverBroadcastCall>
+  <div class="messagesBox">
+    <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
+      <div class="IncommingVideo border VideoCallBlock">
+        <video class="w-100" id="remoteVideo" muted style="object-fit: fill" autoplay poster="./assets/images/vidd.mp4">
+          <source src="" type="video/mp4" />
+        </video>
+      </div>
+      <p class="settingsIcon callContainerStatus white m-3">{{ callTime | formatTime }}</p>
+      <p class="callerName text-capitalize text-white">Public Broadcast </p>
+      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
+    </div>
+  </div>
+
+</ng-template>
+
+<div id="myModal" class="modal" *ngIf="StartBroadcast">
+  <div class="StartBroadcast">
+    <div class="chatPopupContent groupPopup">
+      <span class="close" (click)="StartBroadcast = false ">&times;</span>
+      <ng-container *ngIf="!creatingyourURL">
+        <button type="submit" class="btn btn-success mt-5 px-5 py-2" (click)="createURl()">
+          Start Broadcast
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="creatingyourURL">
+        <label>Creating your URL....</label>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
 
 <ng-template #content let-modal>
   <div class="createChatPopup modal-body">
@@ -283,21 +283,23 @@
   </div>
 </ng-template>
 
-<!-- broadcast -->
 
 <ng-template #videoPublicBroadcast>
   <div class="messagesBox">
-    <div class="callContainer">
-      <p class="callContainerStatus" *ngIf="!calling.participant.length">Initiating Public Broadcast 11</p>
-      <p class="callContainerStatus" *ngIf="calling.participant.length"> Public Broadcast ddd</p>
-      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
-      <div class="groupVideoCallWrapperBlock">
-        <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
+    <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
+      <div class="IncommingVideo border VideoCallBlock">
+        <video class="w-100" id="BroadCastLocalVideo" muted style="object-fit: fill" autoplay
+          poster="./assets/images/vidd.mp4">
           <source src="" type="video/mp4" />
         </video>
       </div>
-      <div style="width: 200px;" class="callButtonsContainer">
-        <img src="./assets/images/video-call-{{settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
+      <p class="settingsIcon callContainerStatus white m-3">{{ callTime | formatTime }}</p>
+      <p class="callerName text-capitalize text-white" *ngIf="!callTime">Initiating Public Broadcast
+      </p>
+      <p class="callerName text-capitalize text-white" *ngIf="callTime"> Public Broadcast </p>
+      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
+      <div style="width: 200px" class="callButtonsContainer">
+        <img src="./assets/images/video-call-{{ settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
           class="responseButtonImg" (click)="changeSettings('isOnInProgressCamara')" />
         <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
         <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
@@ -306,65 +308,3 @@
     </div>
   </div>
 </ng-template>
-
-<ng-template #InitiatingPublicBroadcast>
-  <div class="messagesBox">
-    <div class="callContainer">
-      <p class="callContainerStatus">Initiating Public Broadcast</p>
-      <!-- <p class="callerName text-capitalize">{{ calling.callerName }} </p> -->
-      <button class="btn btn-success" (click)="copyText()">Copy URL</button>
-      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
-
-      <div class="groupVideoCallWrapperBlock"
-        [ngClass]="groupOutgoingVideoCall ? 'groupVideoCallWrapper_noCall ' : 'groupVideoCallWrapper_Call'">
-        <!-- <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
-          <source src="" type="video/mp4" />
-        </video> -->
-      </div>
-
-      <div style="width: 150px;" class="callButtonsContainer">
-        <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
-        <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
-          class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-        <!-- <img src="./assets/images/speaker-on.png" class="responseButtonImg" /> -->
-      </div>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #receiverModePublicBroadcast>
-  <div class="messagesBox">
-    <div class="callContainer">
-      <p class="callContainerStatus">Public Broadcast</p>
-      <div>
-        <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
-        <div class="groupVideoCallWrapperBlock">
-          <video id="remoteVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
-            <source src="" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-      <div style="width: 150px;" class="callButtonsContainer">
-        <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
-      </div>
-    </div>
-  </div>
-</ng-template>
-
-<div id="myModal" class="modal" *ngIf="StartBroadcast">
-  <div class="StartBroadcast">
-    <div class="chatPopupContent groupPopup">
-      <span class="close" (click)="StartBroadcast = false ">&times;</span>
-      <ng-container *ngIf="!creatingyourURL">
-        <button type="submit" class="btn btn-success mt-5 px-5 py-2" (click)="createURl()">
-          Start Broadcast
-        </button>
-      </ng-container>
-
-      <ng-container *ngIf="creatingyourURL">
-        <label>Creating your URL....</label>
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </ng-container>
-    </div>
-  </div>
-</div>

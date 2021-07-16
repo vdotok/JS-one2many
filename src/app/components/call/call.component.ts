@@ -22,11 +22,12 @@ export class CallComponent implements OnInit {
   @ViewChild('groupIncommingAudioCall') groupIncommingAudioCall: TemplateRef<any>;
   @ViewChild('groupOutgoingAudioCall') groupOutgoingAudioCall: TemplateRef<any>;
   @ViewChild('groupOngoingAudioCall') groupOngoingAudioCall: TemplateRef<any>;
-  @ViewChild('groupIncommingVideoCall') groupIncommingVideoCall: TemplateRef<any>;
-  @ViewChild('groupVideoCall') groupVideoCall: TemplateRef<any>;
-  @ViewChild('InitiatingPublicBroadcast') InitiatingPublicBroadcast: TemplateRef<any>;
-  @ViewChild('receiverModePublicBroadcast') receiverModePublicBroadcast: TemplateRef<any>;
+
+
+  @ViewChild('IncommingBroadcastCall ') IncommingBroadcastCall: TemplateRef<any>;
+  @ViewChild('receiverBroadcastCall') receiverBroadcastCall: TemplateRef<any>;
   @ViewChild('videoPublicBroadcast') videoPublicBroadcast: TemplateRef<any>;
+
   @ViewChild('searchInput') searchInput: ElementRef;
   currentUserName = StorageService.getAuthUsername();
   currentUserData = StorageService.getUserData();
@@ -41,6 +42,7 @@ export class CallComponent implements OnInit {
   callTime = 0;
   groupOutgoingVideoCall = false;
   sdkconnected = false;
+  PUBLIC_URL = '';
   activeChat: any = {
     chatHistory: []
   };
@@ -61,10 +63,8 @@ export class CallComponent implements OnInit {
       groupIncommingAudioCall: this.groupIncommingAudioCall,
       groupOutgoingAudioCall: this.groupOutgoingAudioCall,
       groupOngoingAudioCall: this.groupOngoingAudioCall,
-      groupIncommingVideoCall: this.groupIncommingVideoCall,
-      groupVideoCall: this.groupVideoCall,
-      InitiatingPublicBroadcast: this.InitiatingPublicBroadcast,
-      receiverModePublicBroadcast: this.receiverModePublicBroadcast,
+      IncommingBroadcastCall: this.IncommingBroadcastCall,
+      receiverBroadcastCall: this.receiverBroadcastCall,
       videoPublicBroadcast: this.videoPublicBroadcast
     }
     return templateList[this.calling.templateName];
@@ -132,18 +132,29 @@ export class CallComponent implements OnInit {
     });
 
     this.vdkCallService.Client.on("call", response => {
-      console.error("groupCall response", response);
+      console.error("call response", response);
       switch (response.type) {
         case "CALL_RECEIVED":
           this.screen = 'MAIN'
           this.calling.callerName = this.findUserName(response.from);
-          this.calling.templateName = response.call_type == 'video' ? 'groupIncommingVideoCall' : 'groupIncommingAudioCall';
+          this.calling.templateName = response.call_type == 'video' ? 'IncommingBroadcastCall' : 'groupIncommingAudioCall';
+          this.changeDetector.detectChanges();
           this.calling.call_type = response.call_type;
           this.changeDetector.detectChanges();
           break;
         case "CALL_STATUS":
           const displaystyle = response.video_status ? 'block' : 'none';
           if (document.getElementById('remoteVideo')) document.getElementById('remoteVideo').style.display = displaystyle;
+          break;
+        case "CALL_ACCEPTED":
+          this.startWatch();
+          break;
+        case "PUBLIC_URL":
+          this.creatingyourURL = false;
+          this.StartBroadcast = false;
+          this.calling.templateName = 'videoPublicBroadcast';
+          this.PUBLIC_URL = response.url;
+          this.changeDetector.detectChanges();
           break;
       }
     });
@@ -242,7 +253,6 @@ export class CallComponent implements OnInit {
   rejectedCall() {
     this.calling.templateName = 'noCall';
     this.changeDetector.detectChanges();
-    this.vdkCallService.leaveGroupCall();
   }
 
   resetCall() {
@@ -259,13 +269,15 @@ export class CallComponent implements OnInit {
     this.callTime = 0;
     this.screen = 'LISTING';
     this.groupOutgoingVideoCall = false;
+    this.PUBLIC_URL = '';
+    this.broadcastSettings.broadcastType = '';
+    this.broadcastSettings.features.map(item => item.selected = false);
     if (this.countDownTime) this.countDownTime.unsubscribe();
     this.changeDetector.detectChanges();
   }
 
   stopCall() {
     this.calling.templateName = 'noCall';
-    this.vdkCallService.leaveGroupCall();
     this.resetCall();
     this.changeDetector.detectChanges();
   }
@@ -275,14 +287,14 @@ export class CallComponent implements OnInit {
   }
 
   acceptcall() {
-    if (this.inProgressCall()) return;
-    this.calling.templateName = this.calling.call_type == 'video' ? 'receiverModePublicBroadcast' : 'groupOngoingAudioCall';
+    this.calling.templateName = this.calling.call_type == 'video' ? 'receiverBroadcastCall' : 'groupOngoingAudioCall';
     this.changeDetector.detectChanges();
     setTimeout(() => {
       this.changeDetector.detectChanges();
       this.groupOutgoingVideoCall = false;
       const localVideo = document.getElementById("remoteVideo");
       this.vdkCallService.AcceptBroadcast(localVideo);
+      this.startWatch();
       this.changeDetector.detectChanges();
     });
   }
@@ -291,37 +303,6 @@ export class CallComponent implements OnInit {
     if (!this.callTime) {
       this.countDownTime = timer(0, 1000).subscribe(() => ++this.callTime);
     }
-  }
-
-  startVideoCall(group) {
-    if (this.inCall()) return;
-    this.screen = 'MAIN';
-    this.groupOutgoingVideoCall = true;
-    this.calling.templateName = 'groupVideoCall';
-    this.calling['callerName'] = group['chatTitle'];
-    this.changeDetector.detectChanges();
-    const p = group['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
-    const params = {
-      call_type: "video",
-      localVideo: document.getElementById("localVideo"),
-      to: [...p],
-    }
-    this.vdkCallService.groupCall(params);
-  }
-
-  startAudioCall(group) {
-    if (this.inCall()) return;
-    this.calling.call_type = 'audio';
-    this.screen = 'MAIN';
-    this.calling.templateName = 'groupOutgoingAudioCall';
-    this.calling['callerName'] = group['chatTitle'];
-    const participants = group['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
-    const params = {
-      call_type: "audio",
-      localVideo: document.getElementById("localAudio"),
-      to: [...participants],
-    }
-    this.vdkCallService.groupCall(params);
   }
 
   changeSettings(filed) {
@@ -346,40 +327,6 @@ export class CallComponent implements OnInit {
     }
   }
 
-  isShowVideo() {
-    return this.calling.templateName != 'groupVideoCall' || this.calling.call_type != 'video';
-  }
-
-  addParticipant(response) {
-    const user = this.AllUsers.find(user => user.ref_id == response.participant);
-    this.calling.participant.push(user);
-    this.changeDetector.detectChanges();
-    setTimeout(() => {
-      this.changeDetector.detectChanges();
-      this.vdkCallService.setParticipantVideo(response.participant, document.getElementById(response.participant));
-      const user = this.findUserName(response.participant);
-      const textmsg = user + ' ' + 'has joined';
-      this.toastr.success(textmsg);
-    });
-    this.changeDetector.detectChanges();
-  }
-
-  removeParticipant(response) {
-    const index = this.calling.participant.findIndex(user => user.ref_id == response.participant);
-    const user = this.findUserName(response.participant);
-    const textmsg = user + ' ' + 'has left';
-    this.toastr.success(textmsg);
-    this.calling.participant.splice(index, 1);
-    if (!this.calling.participant.length) {
-      this.resetCall();
-    }
-    this.changeDetector.detectChanges();
-  }
-
-  inProgressCall() {
-    return this.calling.templateName == 'groupVideoCall' || this.calling.templateName == 'groupOngoingAudioCall';
-  }
-
   isHideThread() {
     return isMobile() ? this.screen != 'LISTING' : false;
   }
@@ -397,49 +344,56 @@ export class CallComponent implements OnInit {
     this.broadcastSettings.features[i].selected = !this.broadcastSettings.features[i].selected;
   }
 
-  submitFeatures() {
-    if (!this.isValidFeatureSelection()) {
-      return;
-    }
-    // this.creatingyourURL = false;
-    // this.StartBroadcast = true;
-    setTimeout(() => {
-      this.calling.templateName = 'videoPublicBroadcast';
-      setTimeout(() => {
-        this.broadCast();
-      });
-    }, 2000);
-  }
-
   isValidFeatureSelection() {
     return this.broadcastSettings.broadcastType && !(this.broadcastSettings.features[0].selected && this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
+  }
+
+  copyText() {
+    this.clipboardApi.copyFromContent(this.PUBLIC_URL);
+    this.toastr.success("Copied to Clipboard");
+  }
+
+  broadCast() {
+    if (!this.isValidFeatureSelection()) return;
+    this.calling.templateName = 'videoPublicBroadcast';
+    setTimeout(() => {
+      const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+      const params = {
+        call_type: "video",
+        localVideo: document.getElementById("BroadCastLocalVideo"),
+        to: [...participants],
+      };
+      this.vdkCallService.Broadcasting(params);
+    });
+  }
+
+  submitFeatures() {
+    if (!this.isValidFeatureSelection()) return;
+    this.creatingyourURL = false;
+    this.StartBroadcast = true;
   }
 
   createURl() {
     this.creatingyourURL = true;
     setTimeout(() => {
+      this.creatingyourURL = false;
+      this.StartBroadcast = false;
       this.calling.templateName = 'videoPublicBroadcast';
-      setTimeout(() => {
-        this.broadCast();
-      });
-    }, 2000);
+      this.publicBroadcast();
+    }, 1000);
   }
 
-  copyText() {
-    this.clipboardApi.copyFromContent('Text  dsdfkk');
-    this.toastr.success("Copied to Clipboard");
-  }
+  publicBroadcast() {
+    setTimeout(() => {
+      const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+      const params = {
+        call_type: "video",
+        localVideo: document.getElementById("BroadCastLocalVideo"),
+        to: [...participants],
+      };
+      this.vdkCallService.PulicBroadCast(params);
+    });
 
-  broadCast() {
-    this.StartBroadcast = false;
-    this.creatingyourURL = false;
-    const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
-    const params = {
-      call_type: "video",
-      localVideo: document.getElementById("BroadCastLocalVideo"),
-      to: [...participants],
-    };
-    this.vdkCallService.Broadcasting(params);
   }
 
   isMobile() {
@@ -451,7 +405,6 @@ export class CallComponent implements OnInit {
     this.screen = "CHAT";
     this.changeDetector.detectChanges();
   }
-
 
   setActiveChat(group) {
     this.activeChat = group;

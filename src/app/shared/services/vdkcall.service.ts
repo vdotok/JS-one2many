@@ -61,4 +61,8 @@ export class VdkCallService {
     this.Client.AcceptBroadcast(parms)
   }
 
+  PulicBroadCast(parms) {
+    this.Client.PulicBroadCast(parms)
+  }
+
 }

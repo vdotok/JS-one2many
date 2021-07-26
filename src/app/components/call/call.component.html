@@ -204,45 +204,6 @@
 
 <!-- broadcast -->
 
-<ng-template #videoPublicBroadcast1>
-  <div class="messagesBox">
-    <div class="callContainer">
-      <p class="callContainerStatus" *ngIf="!calling.participant.length">Initiating Public Broadcast 11</p>
-      <p class="callContainerStatus" *ngIf="calling.participant.length"> Public Broadcast ddd</p>
-      <img src="./assets/images/blue-avatar.png" class="avatarIcon hand" (click)="copyText()" />
-
-      <div class="groupVideoCallWrapperBlock">
-        <video id="BroadCastLocalVideo" style="object-fit: cover; width: 100%;" autoplay muted autoplay>
-          <source src="" type="video/mp4" />
-        </video>
-      </div>
-      <div style="width: 200px;" class="callButtonsContainer">
-        <img src="./assets/images/video-call-{{settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
-          class="responseButtonImg" (click)="changeSettings('isOnInProgressCamara')" />
-        <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
-        <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
-          class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
-      </div>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #receiverBroadcastCall>
-  <div class="messagesBox">
-    <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
-      <div class="IncommingVideo border VideoCallBlock">
-        <video class="w-100" id="remoteVideo" muted style="object-fit: fill" autoplay poster="./assets/images/vidd.mp4">
-          <source src="" type="video/mp4" />
-        </video>
-      </div>
-      <p class="settingsIcon callContainerStatus white m-3">{{ callTime | formatTime }}</p>
-      <p class="callerName text-capitalize text-white">Public Broadcast </p>
-      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
-    </div>
-  </div>
-
-</ng-template>
-
 <div id="myModal" class="modal" *ngIf="StartBroadcast">
   <div class="StartBroadcast">
     <div class="chatPopupContent groupPopup">
@@ -260,7 +221,6 @@
     </div>
   </div>
 </div>
-
 
 <ng-template #content let-modal>
   <div class="createChatPopup modal-body">
@@ -283,8 +243,54 @@
   </div>
 </ng-template>
 
+<!-- video broadcast only start -->
 
-<ng-template #videoPublicBroadcast>
+<ng-template #receiverBroadcastCall>
+  <div class="messagesBox">
+    <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
+      <div class="IncommingVideo border VideoCallBlock">
+        <video class="w-100" id="remoteVideo" muted style="object-fit: fill" autoplay poster="./assets/images/vidd.mp4">
+          <source src="" type="video/mp4" />
+        </video>
+      </div>
+      <p class="settingsIcon callContainerStatus white m-3">{{ callTime | formatTime }}</p>
+      <p class="callerName text-capitalize text-white">Public Broadcast </p>
+      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #videoBroadcast>
+  <div class="messagesBox">
+    <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
+      <div class="IncommingVideo border VideoCallBlock">
+        <video class="w-100" id="BroadCastLocalVideo" muted style="object-fit: fill" autoplay
+          poster="./assets/images/vidd.mp4">
+          <source src="" type="video/mp4" />
+        </video>
+      </div>
+      <p class="settingsIcon callContainerStatus white m-3">{{ callTime | formatTime }}</p>
+      <p class="callerName text-capitalize text-white" *ngIf="!callTime">Initiating Public Broadcast
+      </p>
+      <p class="callerName text-capitalize text-white" *ngIf="callTime"> Public Broadcast </p>
+      <img src="./assets/images/blue-avatar.png" class="avatarIcon" />
+      <div style="width: 200px" class="callButtonsContainer">
+        <img src="./assets/images/video-call-{{ settings.isOnInProgressCamara ? 'on.png' :'off.png'}}"
+          class="responseButtonImg" (click)="changeSettings('isOnInProgressCamara')" />
+        <img src="./assets/images/decline-button.png" class="responseButtonImg" (click)="stopCall()" />
+        <img src="./assets/images/microphone-{{ settings.isOnInProgressMicrophone ? 'on.png' :'off.png'}}"
+          class="responseButtonImg" (click)="changeSettings('isOnInProgressMicrophone')" />
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- video broadcast only end -->
+
+
+
+<ng-template #screenSharingBroadcast>
   <div class="messagesBox">
     <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
       <div class="IncommingVideo border VideoCallBlock">

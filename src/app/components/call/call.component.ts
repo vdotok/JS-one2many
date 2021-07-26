@@ -26,7 +26,7 @@ export class CallComponent implements OnInit {
 
   @ViewChild('IncommingBroadcastCall ') IncommingBroadcastCall: TemplateRef<any>;
   @ViewChild('receiverBroadcastCall') receiverBroadcastCall: TemplateRef<any>;
-  @ViewChild('videoPublicBroadcast') videoPublicBroadcast: TemplateRef<any>;
+  @ViewChild('videoBroadcast') videoBroadcast: TemplateRef<any>;
 
   @ViewChild('searchInput') searchInput: ElementRef;
   currentUserName = StorageService.getAuthUsername();
@@ -65,7 +65,7 @@ export class CallComponent implements OnInit {
       groupOngoingAudioCall: this.groupOngoingAudioCall,
       IncommingBroadcastCall: this.IncommingBroadcastCall,
       receiverBroadcastCall: this.receiverBroadcastCall,
-      videoPublicBroadcast: this.videoPublicBroadcast
+      videoBroadcast: this.videoBroadcast
     }
     return templateList[this.calling.templateName];
   }
@@ -152,7 +152,7 @@ export class CallComponent implements OnInit {
         case "PUBLIC_URL":
           this.creatingyourURL = false;
           this.StartBroadcast = false;
-          this.calling.templateName = 'videoPublicBroadcast';
+          this.calling.templateName = 'videoBroadcast';
           this.PUBLIC_URL = response.url;
           this.changeDetector.detectChanges();
           break;
@@ -355,7 +355,7 @@ export class CallComponent implements OnInit {
 
   broadCast() {
     if (!this.isValidFeatureSelection()) return;
-    this.calling.templateName = 'videoPublicBroadcast';
+    this.calling.templateName = 'videoBroadcast';
     setTimeout(() => {
       const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
       const params = {
@@ -378,12 +378,13 @@ export class CallComponent implements OnInit {
     setTimeout(() => {
       this.creatingyourURL = false;
       this.StartBroadcast = false;
-      this.calling.templateName = 'videoPublicBroadcast';
+      this.calling.templateName = 'videoBroadcast';
       this.publicBroadcast();
     }, 1000);
   }
 
   publicBroadcast() {
+    console.error(this.isVideoBroadCast());
     setTimeout(() => {
       const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
       const params = {
@@ -408,6 +409,21 @@ export class CallComponent implements OnInit {
 
   setActiveChat(group) {
     this.activeChat = group;
+  }
+
+  isVideoBroadCast(): boolean {
+    const features = this.broadcastSettings.features.filter(item => item.selected);
+    return features.length == 1 && features[0].name == "camara";
+  }
+
+  isScreenSharingBroadCast(): boolean {
+    const features = this.broadcastSettings.features.filter(item => item.selected);
+    return features.length == 1 && features[0].name != "camara";
+  }
+
+  isVideoAndScreenBroadCast(): boolean {
+    const features = this.broadcastSettings.features.filter(item => item.selected);
+    return features.length > 1
   }
 
 }

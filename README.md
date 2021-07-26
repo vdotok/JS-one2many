@@ -43,7 +43,7 @@ Install the npm packages described in the `package.json` and verify that it work
 
 ```shell
 npm install
-npm run serve
+ng serve
 ```
 Open browser application is running at <a href="http://localhost:4200" target="_blank" title="localhost">
 http://localhost:4200</a> 

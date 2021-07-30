@@ -1,4 +1,4 @@
-# Vdotok QuickStart Source for Group Call Demo
+# Vdotok QuickStart Source for One to Many Broadcast call Demo
 This is a demo project to demonstrate using  Group call demo with Angular 9+.
 
 ## Live Demo

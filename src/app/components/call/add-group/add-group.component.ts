@@ -46,9 +46,7 @@ export class AddGroupComponent implements OnInit {
   }
 
   resetGroupSettings(broadCastType) {
-    console.error("resetGroupSettings", broadCastType);
     this.hasLimit = broadCastType != 'PublicBroadcast';
-    console.error("resetGroupSettings", this.hasLimit);
     this.selectedUsers = [];
     this.AllUsers.forEach(element => element['selected'] = false);
   }
@@ -64,7 +62,6 @@ export class AddGroupComponent implements OnInit {
         this.addGroup();
       }
     })
-
   }
 
   ngAfterViewInit(): void {
@@ -166,15 +163,12 @@ export class AddGroupComponent implements OnInit {
         this.loading = false;
         this.changeEvent.emit("THREAD");
       });
-
     } else {
-
       this.dialogRef = this.modalService.open(content, {
         centered: true,
         backdrop: 'static',
         windowClass: 'dark-modal'
       });
-
     }
   }
 
@@ -182,7 +176,6 @@ export class AddGroupComponent implements OnInit {
     FormsHandler.validateForm(this.form);
     const useridArray = this.selectedUsers.map(user => user.user_id);
     if (this.form.invalid || !useridArray.length || this.loading) return;
-
     this.loading = true;
     this.changeDetector.detectChanges();
     let data = {

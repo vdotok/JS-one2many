@@ -63,6 +63,7 @@
       <div class="btn btn-danger" (click)="stopCall()" *ngIf="calling.templateName =='receiverBroadcastCall' ">End Call
       </div>
     </div>
+
     <ng-container [ngTemplateOutlet]="selectedTemplate"></ng-container>
   </div>
 </div>
@@ -291,7 +292,7 @@
   <div class="messagesBox">
     <div class="callContainer" [ngClass]="calling.templateName == 'noCall' ? '' :'oncall' ">
       <div class="IncommingVideo border VideoCallBlock">
-        <video class="w-100" id="BroadCastLocalVideo" muted style="object-fit: fill" autoplay
+        <video class="w-100" id="screenShareVideo" muted style="object-fit: fill" autoplay
           poster="./assets/images/vidd.mp4">
           <source src="" type="video/mp4" />
         </video>

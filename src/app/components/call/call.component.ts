@@ -27,6 +27,7 @@ export class CallComponent implements OnInit {
   @ViewChild('IncommingBroadcastCall ') IncommingBroadcastCall: TemplateRef<any>;
   @ViewChild('receiverBroadcastCall') receiverBroadcastCall: TemplateRef<any>;
   @ViewChild('videoBroadcast') videoBroadcast: TemplateRef<any>;
+  @ViewChild('screenSharingBroadcast') screenSharingBroadcast: TemplateRef<any>;
 
   @ViewChild('searchInput') searchInput: ElementRef;
   currentUserName = StorageService.getAuthUsername();
@@ -65,7 +66,8 @@ export class CallComponent implements OnInit {
       groupOngoingAudioCall: this.groupOngoingAudioCall,
       IncommingBroadcastCall: this.IncommingBroadcastCall,
       receiverBroadcastCall: this.receiverBroadcastCall,
-      videoBroadcast: this.videoBroadcast
+      videoBroadcast: this.videoBroadcast,
+      screenSharingBroadcast: this.screenSharingBroadcast
     }
     return templateList[this.calling.templateName];
   }
@@ -93,6 +95,8 @@ export class CallComponent implements OnInit {
 
   StartBroadcast = false;
   creatingyourURL = false;
+  videoElem;
+  logElem;
 
   constructor(
     private _fb: FormBuilder,
@@ -354,6 +358,14 @@ export class CallComponent implements OnInit {
   }
 
   broadCast() {
+    if (this.isVideoBroadCast()) {
+      this.videoBroadCast();
+    } else if (this.isScreenSharingBroadCast()) {
+      this.screenBroadCast();
+    }
+  }
+
+  videoBroadCast() {
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'videoBroadcast';
     setTimeout(() => {
@@ -364,6 +376,20 @@ export class CallComponent implements OnInit {
         to: [...participants],
       };
       this.vdkCallService.Broadcasting(params);
+    });
+  }
+
+  screenBroadCast() {
+    if (!this.isValidFeatureSelection()) return;
+    this.calling.templateName = 'screenSharingBroadcast';
+    setTimeout(() => {
+      this.startCapture();
+    });
+  }
+
+  sharescreen() {
+    setTimeout(() => {
+      this.startCapture();
     });
   }
 
@@ -384,7 +410,6 @@ export class CallComponent implements OnInit {
   }
 
   publicBroadcast() {
-    console.error(this.isVideoBroadCast());
     setTimeout(() => {
       const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
       const params = {
@@ -394,7 +419,6 @@ export class CallComponent implements OnInit {
       };
       this.vdkCallService.PulicBroadCast(params);
     });
-
   }
 
   isMobile() {
@@ -424,6 +448,38 @@ export class CallComponent implements OnInit {
   isVideoAndScreenBroadCast(): boolean {
     const features = this.broadcastSettings.features.filter(item => item.selected);
     return features.length > 1
+  }
+
+
+  startCapture() {
+    if (!this.isValidFeatureSelection()) return;
+    //these changes need to do in sdk level for reference only
+    // this.logElem = "";
+    // var displayMediaOptions = {
+    //   video: {
+    //     cursor: "always"
+    //   },
+    //   audio: false
+    // };
+    // let videoElem: any = document.getElementById("screenShareVideo");
+    // const mediaDevices = navigator.mediaDevices as any;
+    // let stream = await navigator.mediaDevices.getUserMedia({ "video": true });
+    // // let stream = await navigator.mediaDevices.d
+    // // let stream = await mediaDevices.getDisplayMedia();
+    // videoElem.srcObject = stream;
+    const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+    const params = {
+      call_type: "video",
+      localVideo: document.getElementById("screenShareVideo"),
+      to: [...participants],
+    };
+    this.vdkCallService.Broadcasting(params);
+  }
+
+  stopCapture() {
+    let tracks = this.videoElem.srcObject.getTracks();
+    tracks.forEach(track => track.stop());
+    this.videoElem.srcObject = null;
   }
 
 }

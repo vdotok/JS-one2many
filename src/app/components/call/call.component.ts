@@ -283,6 +283,7 @@ export class CallComponent implements OnInit {
   stopCall() {
     this.calling.templateName = 'noCall';
     this.resetCall();
+    this.vdkCallService.EndPulicBroadCast();
     this.changeDetector.detectChanges();
   }
 
@@ -369,7 +370,7 @@ export class CallComponent implements OnInit {
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'videoBroadcast';
     setTimeout(() => {
-      const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+      const participants = this.getChatParticipants();
       const params = {
         call_type: "video",
         localVideo: document.getElementById("BroadCastLocalVideo"),
@@ -408,10 +409,17 @@ export class CallComponent implements OnInit {
       this.publicBroadcast();
     }, 1000);
   }
+  private getChatParticipants() {
+    let participants = [];
+    if (this.activeChat && this.activeChat['participants'] && this.activeChat['participants'].length) {
+      participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+    }
+    return participants;
+  }
 
   publicBroadcast() {
     setTimeout(() => {
-      const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+      const participants = this.getChatParticipants();
       const params = {
         call_type: "video",
         localVideo: document.getElementById("BroadCastLocalVideo"),
@@ -467,7 +475,7 @@ export class CallComponent implements OnInit {
     // // let stream = await navigator.mediaDevices.d
     // // let stream = await mediaDevices.getDisplayMedia();
     // videoElem.srcObject = stream;
-    const participants = this.activeChat['participants'].filter(g => g.ref_id != this.currentUserName).map(g => g.ref_id);
+    const participants = this.getChatParticipants();
     const params = {
       call_type: "video",
       localVideo: document.getElementById("screenShareVideo"),

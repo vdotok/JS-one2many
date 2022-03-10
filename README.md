@@ -2,7 +2,7 @@
 This is a demo project to demonstrate “One-to-Many Broadcast” using Angular 9+.
 
 ## Live Demo
- Click <a href="https://one2many.vdotok.com" target="_blank" title="Chat Demo">here</a> to visit the live demo of VdoTok many-to-many group call.
+ Click <a href="https://one2many.vdotok.com" target="_blank" title="Chat Demo">here</a> to visit the live demo of VdoTok one-to-many group call.
   
  
 ## Prerequisites:

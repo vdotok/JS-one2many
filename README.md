@@ -24,10 +24,17 @@ Register at <a href="https://userpanel.vdotok.com/norgic/chatSDK" target="_blank
 - For One to Many Call in the application, You can update the projectID by following these steps. ( JS-ONE2MANY -> src -> app -> shared -> services -> vdkcall.service.ts ).
 
 You have to Update Project_id at the Login and Signup request by following these steps.
-- At Login request. ( JS-WEBAPP -> src -> app -> components -> login -> login.component.ts )
-- At Signup request. ( JS-WEBAPP -> src -> app -> components -> sign-up -> sign-up.component.ts )
+- At Login request. ( JS-ONE2MANY -> src -> app -> components -> login -> login.component.ts )
+- At Signup request. ( JS-ONE2MANY -> src -> app -> components -> sign-up -> sign-up.component.ts )
 
 After replacing the projectID at all the above places, compile and run the project.
+
+
+### Base URL
+
+You have to update BaseUrl with projectID. You can update **apiBaseUrl** by following these steps.
+- In environment.prod.ts File, (JS-ONE2MANY -> src -> environments -> environment.prod.ts)
+- In environment.ts File, (JS-ONE2MANY -> src -> environments -> environment.ts)
 
 ## Setting up the local environment
 

@@ -367,12 +367,15 @@ export class CallComponent implements OnInit {
   }
 
   videoBroadCast() {
+    console.log("video broadcast");
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'videoBroadcast';
     setTimeout(() => {
       const participants = this.getChatParticipants();
       const params = {
-        call_type: "video",
+        video: 1,
+        audio:1,
+        videoType: "video",
         localVideo: document.getElementById("BroadCastLocalVideo"),
         to: [...participants],
       };
@@ -381,10 +384,19 @@ export class CallComponent implements OnInit {
   }
 
   screenBroadCast() {
+    console.log("screen broadcast");
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'screenSharingBroadcast';
     setTimeout(() => {
-      this.startCapture();
+      const participants = this.getChatParticipants();
+      const params = {
+        video: 1,
+        audio:1,
+        videoType: "screen",
+        localVideo: document.getElementById("BroadCastLocalVideo"),
+        to: [...participants],
+      };
+      this.vdkCallService.Broadcasting(params);
     });
   }
 
@@ -401,13 +413,15 @@ export class CallComponent implements OnInit {
   }
 
   createURl() {
+    console.log("creating url");
     this.creatingyourURL = true;
     setTimeout(() => {
+      console.log("creating url timeot");
       this.creatingyourURL = false;
       this.StartBroadcast = false;
       this.calling.templateName = 'videoBroadcast';
       this.publicBroadcast();
-    }, 1000);
+    }, 4000);
   }
   private getChatParticipants() {
     let participants = [];
@@ -418,10 +432,14 @@ export class CallComponent implements OnInit {
   }
 
   publicBroadcast() {
+    console.log("public broadcasting")
     setTimeout(() => {
       const participants = this.getChatParticipants();
       const params = {
         call_type: "video",
+        video:1,
+        audio:1,
+        videoType: "camera",
         localVideo: document.getElementById("BroadCastLocalVideo"),
         to: [...participants],
       };

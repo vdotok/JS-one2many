@@ -6,7 +6,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { StorageService } from 'src/app/shared/services/storage.service';
 import { timer, Subscription } from "rxjs";
 import { ToastrService } from 'ngx-toastr';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import FormsHandler from 'src/app/shared/FormsHandler/FormsHandler';
 import { ClipboardService } from 'ngx-clipboard';
@@ -36,7 +36,7 @@ export class CallComponent implements OnInit {
   screen = 'LISTING';
   dialogRef: any;
   loading = true;
-  groupForm: FormGroup;
+  groupForm: UntypedFormGroup;
   AllGroups = [];
   AllUsers = [];
   countDownTime: Subscription;
@@ -99,7 +99,7 @@ export class CallComponent implements OnInit {
   logElem;
 
   constructor(
-    private _fb: FormBuilder,
+    private _fb: UntypedFormBuilder,
     public vdkCallService: VdkCallService,
     private svc: BaseService,
     private router: Router,
@@ -110,8 +110,8 @@ export class CallComponent implements OnInit {
     private clipboardApi: ClipboardService
   ) {
     this.groupForm = this._fb.group({
-      'group_id': new FormControl('', [Validators.required]),
-      'group_title': new FormControl('', [Validators.required, Validators.maxLength(100)]),
+      'group_id': new UntypedFormControl('', [Validators.required]),
+      'group_title': new UntypedFormControl('', [Validators.required, Validators.maxLength(100)]),
     }, { updateOn: 'change' });
     this.vdkCallService.initConfigure();
   }

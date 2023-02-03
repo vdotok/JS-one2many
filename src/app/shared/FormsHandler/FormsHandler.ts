@@ -1,7 +1,7 @@
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 
 export default class FormsHandler {
-    static validateForm(form: FormGroup) {
+    static validateForm(form: UntypedFormGroup) {
         if (form.valid) {
             return true;
         } else {

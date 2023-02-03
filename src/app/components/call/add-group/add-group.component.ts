@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import FormsHandler from 'src/app/shared/FormsHandler/FormsHandler';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { StorageService } from 'src/app/shared/services/storage.service';
@@ -23,7 +23,7 @@ export class AddGroupComponent implements OnInit {
   @Input() broadCastType = '';
   currentUserName = StorageService.getAuthUsername();
   currentUserData = StorageService.getUserData();
-  form: FormGroup;
+  form: UntypedFormGroup;
   loading = true;
   AllUsers = [];
   CopyAllUsers = [];
@@ -35,7 +35,7 @@ export class AddGroupComponent implements OnInit {
   constructor(
     private svc: BaseService,
     private toastr: ToastrService,
-    private _fb: FormBuilder,
+    private _fb: UntypedFormBuilder,
     private modalService: NgbModal,
     private changeDetector: ChangeDetectorRef,
   ) {
@@ -54,7 +54,7 @@ export class AddGroupComponent implements OnInit {
   ngOnInit() {
     this.hasLimit = this.broadCastType != 'PublicBroadcast';
     this.form = this._fb.group({
-      'group_title': new FormControl('', [Validators.required, Validators.maxLength(100)]),
+      'group_title': new UntypedFormControl('', [Validators.required, Validators.maxLength(100)]),
     }, { updateOn: 'change' });
 
     document.addEventListener("keyup", event => {

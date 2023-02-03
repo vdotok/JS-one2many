@@ -124,12 +124,12 @@ export class CallComponent implements OnInit {
     });
 
     this.vdkCallService.Client.on("register", response => {
-      console.error("register response", response);
+      console.log("register response", response);
     });
 
     this.vdkCallService.Client.on("connected", response => {
       this.sdkconnected = true;
-      console.error("connected response", response);
+      console.log("connected response", response);
       if (!this.AllGroups.length) {
         this.getAllGroups();
       }
@@ -396,7 +396,11 @@ export class CallComponent implements OnInit {
         localVideo: document.getElementById("BroadCastLocalVideo"),
         to: [...participants],
       };
-      this.vdkCallService.Broadcasting(params);
+      try {
+        this.vdkCallService.Broadcasting(params);
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 

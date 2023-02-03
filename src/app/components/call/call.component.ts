@@ -24,12 +24,12 @@ export class CallComponent implements OnInit {
   @ViewChild('groupOngoingAudioCall') groupOngoingAudioCall: TemplateRef<any>;
 
 
-  @ViewChild('IncommingBroadcastCall ') IncommingBroadcastCall: TemplateRef<any>;
+  @ViewChild('IncomingBroadcastCall') IncomingBroadcastCall: TemplateRef<any>;
   @ViewChild('receiverBroadcastCall') receiverBroadcastCall: TemplateRef<any>;
   @ViewChild('videoBroadcast') videoBroadcast: TemplateRef<any>;
   @ViewChild('screenSharingBroadcast') screenSharingBroadcast: TemplateRef<any>;
 
-  @ViewChild('searchInput') searchInput: ElementRef;
+  //@ViewChild('searchInput') searchInput: ElementRef;
   currentUserName = StorageService.getAuthUsername();
   currentUserData = StorageService.getUserData();
   threadType = 'THREAD';
@@ -64,7 +64,7 @@ export class CallComponent implements OnInit {
       groupIncommingAudioCall: this.groupIncommingAudioCall,
       groupOutgoingAudioCall: this.groupOutgoingAudioCall,
       groupOngoingAudioCall: this.groupOngoingAudioCall,
-      IncommingBroadcastCall: this.IncommingBroadcastCall,
+      IncomingBroadcastCall: this.IncomingBroadcastCall,
       receiverBroadcastCall: this.receiverBroadcastCall,
       videoBroadcast: this.videoBroadcast,
       screenSharingBroadcast: this.screenSharingBroadcast
@@ -141,7 +141,7 @@ export class CallComponent implements OnInit {
         case "CALL_RECEIVED":
           this.screen = 'MAIN'
           this.calling.callerName = this.findUserName(response.from);
-          this.calling.templateName = response.call_type == 'video' ? 'IncommingBroadcastCall' : 'groupIncommingAudioCall';
+          this.calling.templateName = response.call_type == 'video' ? 'IncomingBroadcastCall' : 'groupIncommingAudioCall';
           this.changeDetector.detectChanges();
           this.calling.call_type = response.call_type;
           this.changeDetector.detectChanges();

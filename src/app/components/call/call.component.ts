@@ -11,6 +11,17 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import FormsHandler from 'src/app/shared/FormsHandler/FormsHandler';
 import { ClipboardService } from 'ngx-clipboard';
 import { VdkCallService } from 'src/app/shared/services/vdkcall.service';
+import { VdkcallBroadcastServiceService } from 'src/app/shared/services/vdkcall-broadcast-service.service';
+
+
+// =========== Public Broadcast ===========//
+// => screen share 
+
+// => camera
+
+
+
+// =========== Group Broadcast ===========//
 
 @Component({
   selector: 'call',
@@ -44,6 +55,7 @@ export class CallComponent implements OnInit {
   groupOutgoingVideoCall = false;
   sdkconnected = false;
   PUBLIC_URL = '';
+  public_broadcast_uuid = "";
   activeChat: any = {
     chatHistory: []
   };
@@ -74,21 +86,30 @@ export class CallComponent implements OnInit {
 
   broadcastSettings = {
     features: [
+      // {
+      //   name: 'screen_sharing_with_app_audio',
+      //   title: 'screen sharing with app audio',
+      //   selected: false
+      // },
+      // {
+      //   name: 'screen_sharing_with_mic_audio',
+      //   title: 'screen sharing with mic audio',
+      //   selected: false
+      // },
       {
-        name: 'screen_sharing_with_app_audio',
+        name: 'screen_sharing_with_app_audio', 
         title: 'screen sharing with app audio',
-        selected: false
-      },
-      {
-        name: 'screen_sharing_with_mic_audio',
-        title: 'screen sharing with mic audio',
-        selected: false
+        selected: false,
       },
       {
         name: 'camara',
-        title: 'camara',
+        title: 'camera with mic audio', //camara
         selected: false
-      }
+      },
+      // {
+      //   name: "dummy",
+      //   title: "dummy"
+      // }
     ],
     broadcastType: ''
   }
@@ -101,6 +122,8 @@ export class CallComponent implements OnInit {
   constructor(
     private _fb: UntypedFormBuilder,
     public vdkCallService: VdkCallService,
+    public vcbs: VdkcallBroadcastServiceService,
+
     private svc: BaseService,
     private router: Router,
     public dialog: MatDialog,
@@ -109,14 +132,23 @@ export class CallComponent implements OnInit {
     private modalService: NgbModal,
     private clipboardApi: ClipboardService
   ) {
+    //this.vcbs.initConfigure();
+
+
     this.groupForm = this._fb.group({
       'group_id': new UntypedFormControl('', [Validators.required]),
       'group_title': new UntypedFormControl('', [Validators.required, Validators.maxLength(100)]),
     }, { updateOn: 'change' });
     this.vdkCallService.initConfigure();
+    // this.vcbs.initConfigure();
+
   }
 
-  ngOnInit() {
+  ngOnInit() { 
+    console.log("**** ngOnInit called\n");
+       
+    // this.vcbs.initConfigure();
+
     this.svc.post('AllUsers').subscribe(v => {
       if (v && v.status == 200) {
         this.AllUsers = v.users;
@@ -124,31 +156,39 @@ export class CallComponent implements OnInit {
     });
 
     this.vdkCallService.Client.on("register", response => {
-      console.log("register response", response);
+      console.error("**** Register response\n", response);
     });
 
     this.vdkCallService.Client.on("connected", response => {
       this.sdkconnected = true;
-      console.log("connected response", response);
+      console.log("**** connected response", response);
+
       if (!this.AllGroups.length) {
         this.getAllGroups();
       }
     });
 
     this.vdkCallService.Client.on("call", response => {
-      console.error("call response", response);
+      console.error("**** Call response\n\n", response);
       switch (response.type) {
         case "CALL_RECEIVED":
           this.screen = 'MAIN'
           this.calling.callerName = this.findUserName(response.from);
-          this.calling.templateName = response.call_type == 'video' ? 'IncomingBroadcastCall' : 'groupIncommingAudioCall';
+          this.calling.templateName = response.callType == 'video' ? 'IncomingBroadcastCall' : 'groupIncommingAudioCall'; //response.call_type
           this.changeDetector.detectChanges();
-          this.calling.call_type = response.call_type;
+          this.calling.call_type = response.callType; //response.call_type
           this.changeDetector.detectChanges();
           break;
         case "CALL_STATUS":
+          
           const displaystyle = response.video_status ? 'block' : 'none';
-          if (document.getElementById('remoteVideo')) document.getElementById('remoteVideo').style.display = displaystyle;
+
+          //if (document.getElementById('remoteVideo') === null) { //if (document.getElementById('remoteVideo'))
+            document.getElementById('remoteVideo').style.display = displaystyle;
+
+          console.log("GC CALL_STATUS:\n\n\n ", document.getElementById('remoteVideo') , response, "\n", displaystyle);
+
+          //}
           break;
         case "CALL_ACCEPTED":
           this.startWatch();
@@ -158,18 +198,35 @@ export class CallComponent implements OnInit {
           this.StartBroadcast = false;
           this.calling.templateName = 'videoBroadcast';
           this.PUBLIC_URL = response.url;
+          this.public_broadcast_uuid = response.uuid;
           this.changeDetector.detectChanges();
           break;
+
+
+        case "NEW_PARTICIPANT":
+          console.error("**** NEW_PARTICIPANT => COUNT =  ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid), "\n\n", this.vdkCallService.Client.participantsInCall[this.public_broadcast_uuid]);
+          break;
+        case "SESSION_BREAK":
+          console.error("**** SESSION_BREAK => COUNT = ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid));
+          break;
+        case "CALL_ENDED":
+          console.error("**** SESSION_CANCEL => COUNT =  ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid)); 
+          this.public_broadcast_uuid = "";
+
+          break;    
       }
     });
 
   }
-
   ngAfterViewInit(): void {
     this.vdkCallService.Client.on("authentication_error", (res: any) => {
       this.toastr.error("SDK Authentication Error", "Opps");
     });
   }
+
+
+
+
 
   deleteGroup(group) {
     this.loading = true;
@@ -254,6 +311,8 @@ export class CallComponent implements OnInit {
     this.router.navigate(['login']);
   }
 
+
+  //====================================== CALLLLLLLLLLLL =====================================//
   rejectedCall() {
     this.calling.templateName = 'noCall';
     this.changeDetector.detectChanges();
@@ -292,27 +351,40 @@ export class CallComponent implements OnInit {
   }
 
   acceptcall() {
+    // this.vcbs.initConfigure();
+
+    console.log("GC accept call\n", this.calling, "\n", document.getElementById("remoteVideo"));
+    
     this.calling.templateName = this.calling.call_type == 'video' ? 'receiverBroadcastCall' : 'groupOngoingAudioCall';
     this.changeDetector.detectChanges();
     setTimeout(() => {
       this.changeDetector.detectChanges();
       this.groupOutgoingVideoCall = false;
       const localVideo = document.getElementById("remoteVideo");
+      console.log("GC localVideo:\n","\n", document.getElementById("remoteVideo"), localVideo);
+
       this.vdkCallService.AcceptBroadcast(localVideo);
       this.startWatch();
       this.changeDetector.detectChanges();
     });
   }
+  //====================================== CALLLLLLLLLLLL =====================================//
+
+
+
+
+
 
   startWatch() {
     if (!this.callTime) {
       this.countDownTime = timer(0, 1000).subscribe(() => ++this.callTime);
     }
   }
-
   changeSettings(filed) {
+    console.log("000 changeSettings:\n ", this.settings, "\n\n", filed);
+    
     this.settings[filed] = !this.settings[filed];
-    console.error("changeSettingschangeSettingschangeSettings", this.settings[filed])
+    //console.error("000 changeSettingschangeSettingschangeSettings", this.settings[filed])
     switch (filed) {
       case 'isOnInProgressCamara':
         this.settings[filed] ? this.vdkCallService.setCameraOn() : this.vdkCallService.setCameraOff();
@@ -322,7 +394,7 @@ export class CallComponent implements OnInit {
         // document.getElementById('localNameHolder').style.display = displayNamestyle;
         break;
       case 'isOnInProgressMicrophone':
-        this.settings[filed] ? this.vdkCallService.setMicUnmute() : this.vdkCallService.setMicMute();
+        this.settings[filed] ? this.vdkCallService.setMicUnmute(this.public_broadcast_uuid) : this.vdkCallService.setMicMute();
         const enabled = this.settings[filed];
         const audiotrack: any = (<HTMLInputElement>document.getElementById("localAudio"));
         if (audiotrack && audiotrack.audioTracks) {
@@ -331,34 +403,112 @@ export class CallComponent implements OnInit {
         break;
     }
   }
-
   isHideThread() {
     return isMobile() ? this.screen != 'LISTING' : false;
   }
-
   isHideChatScreen() {
     return isMobile() ? this.screen != 'MAIN' : false;
   }
-
-  selectFeature(i) {
-    if (i == 0) {
-      this.broadcastSettings.features[1].selected = false;
-    } else if (i == 1) {
-      this.broadcastSettings.features[0].selected = false;
-    }
-    this.broadcastSettings.features[i].selected = !this.broadcastSettings.features[i].selected;
-  }
-
   isValidFeatureSelection() {
-    return this.broadcastSettings.broadcastType && !(this.broadcastSettings.features[0].selected && this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
-  }
+    /*console.log("selected final result: \n\n",this.broadcastSettings.broadcastType,"\n\n", this.broadcastSettings.features[0].selected, "\n\n", this.broadcastSettings.features[1].selected, "\n\n", this.broadcastSettings.features.filter(e => e.selected), "\n\n\n0or1: ",
+    this.broadcastSettings.broadcastType && 
+    (this.broadcastSettings.features[0].selected || this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length
+    );*/
+    
 
+    //Previously added condition
+    // return this.broadcastSettings.broadcastType && 
+    // !(this.broadcastSettings.features[0].selected && this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
+    
+    //Newly added condition
+    return this.broadcastSettings.broadcastType && 
+    (this.broadcastSettings.features[0].selected || this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
+  }
   copyText() {
     this.clipboardApi.copyFromContent(this.PUBLIC_URL);
     this.toastr.success("Copied to Clipboard");
   }
+  sharescreen() {
+    setTimeout(() => {
+      this.startCapture();
+    });
+  }
+
+
+
+
+  // ************************************************ ---- PUBLIC BROADCASTING ---- ***********************************************************//
+  //PB- Choosing camera with mic OR screen share with audio:
+  selectFeature(i) { 
+    // if (i == 0) {
+    //   this.broadcastSettings.features[1].selected = false;
+    // } else if (i == 1) {
+    //   this.broadcastSettings.features[0].selected = false;
+    // }
+    this.broadcastSettings.features[i].selected = !this.broadcastSettings.features[i].selected;
+    console.log("selected: \n\n", i, "\n\n", this.broadcastSettings.features[i]);
+
+  }
+
+
+  //PB- When user selects "Public Broadcast" option + click "continue"=> it then shows popup of creating url which calls createURL() 
+  submitFeatures() {
+    if (!this.isValidFeatureSelection()) return;
+    this.creatingyourURL = false;
+    this.StartBroadcast = true;
+  } 
+
+
+  //PB-
+  createURl() {
+    console.log(" ****  ========= creating url");
+    this.creatingyourURL = true;
+    setTimeout(() => {
+      console.log("creating url timeot");
+      this.creatingyourURL = false;
+      this.StartBroadcast = false;
+      this.calling.templateName = 'videoBroadcast';
+      this.publicBroadcast();
+    }, 4000);
+  }
+
+
+  //PB- FINALLY - When public broadcast starts:
+  publicBroadcast() {
+    console.log("**** === PUBLIC BROADCAST === \n\n", {"Broadcast Type":  this.broadcastSettings.broadcastType, "Screen sharing": this.broadcastSettings.features[0].selected, "Camera with mic": this.broadcastSettings.features[1].selected});
+    let type_of_video;
+    if (this.broadcastSettings.features[1].selected ){
+      type_of_video = "video";
+    } else if (this.broadcastSettings.features[0].selected) {
+      type_of_video = "screen";
+    }
+    setTimeout(() => {
+      const participants = this.getChatParticipants();
+      const params = {
+        call_type: "video",
+        video: 1,
+        audio: 1,
+        videoType: type_of_video,//"video", //"screen" == screen_sharing_case,,,,,,, "video" == camera_with_mic_audio_case
+        localVideo: document.getElementById("BroadCastLocalVideo"),
+        to: [...participants],
+      };
+      //return;
+      this.vdkCallService.PulicBroadCast(params);
+    });
+  }
+  // ************************************************ ---- PUBLIC BROADCASTING ---- ***********************************************************//
+
+
+
+
+
+
+  // ************************************************ ---- GROUP BROADCASTING ---- ***********************************************************//
+  //GB- When user selects "Group Broadcast" option + click "continue"
 
   broadCast() {
+    console.log("**** GROUP BROADCAST: \n\n", "Camera: ", this.isVideoBroadCast(), "\nScreen Share: ", this.isScreenSharingBroadCast());
+    
     if (this.isVideoBroadCast()) {
       this.videoBroadCast();
     } else if (this.isScreenSharingBroadCast()) {
@@ -366,8 +516,9 @@ export class CallComponent implements OnInit {
     }
   }
 
+
   videoBroadCast() {
-    console.log("video broadcast");
+    console.log("**** videoBroadCast() called");
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'videoBroadcast';
     setTimeout(() => {
@@ -378,13 +529,14 @@ export class CallComponent implements OnInit {
         videoType: "video",
         localVideo: document.getElementById("BroadCastLocalVideo"),
         to: [...participants],
+        dummy: "hehe"
       };
+      console.log("**** Video BC Params: \n\n", params);
       this.vdkCallService.Broadcasting(params);
     });
   }
-
   screenBroadCast() {
-    console.log("screen broadcast");
+    console.log("**** screenBroadCast() called");
     if (!this.isValidFeatureSelection()) return;
     this.calling.templateName = 'screenSharingBroadcast';
     setTimeout(() => {
@@ -396,6 +548,8 @@ export class CallComponent implements OnInit {
         localVideo: document.getElementById("BroadCastLocalVideo"),
         to: [...participants],
       };
+      console.log("**** Screen share BC Params: \n\n", params);
+
       try {
         this.vdkCallService.Broadcasting(params);
       } catch (e) {
@@ -403,30 +557,25 @@ export class CallComponent implements OnInit {
       }
     });
   }
+  // *****************************************************************************************************************************************//
 
-  sharescreen() {
-    setTimeout(() => {
-      this.startCapture();
-    });
-  }
 
-  submitFeatures() {
-    if (!this.isValidFeatureSelection()) return;
-    this.creatingyourURL = false;
-    this.StartBroadcast = true;
-  }
 
-  createURl() {
-    console.log("creating url");
-    this.creatingyourURL = true;
-    setTimeout(() => {
-      console.log("creating url timeot");
-      this.creatingyourURL = false;
-      this.StartBroadcast = false;
-      this.calling.templateName = 'videoBroadcast';
-      this.publicBroadcast();
-    }, 4000);
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   private getChatParticipants() {
     let participants = [];
     if (this.activeChat && this.activeChat['participants'] && this.activeChat['participants'].length) {
@@ -434,23 +583,7 @@ export class CallComponent implements OnInit {
     }
     return participants;
   }
-
-  publicBroadcast() {
-    console.log("public broadcasting")
-    setTimeout(() => {
-      const participants = this.getChatParticipants();
-      const params = {
-        call_type: "video",
-        video:1,
-        audio:1,
-        videoType: "camera",
-        localVideo: document.getElementById("BroadCastLocalVideo"),
-        to: [...participants],
-      };
-      this.vdkCallService.PulicBroadCast(params);
-    });
-  }
-
+  
   isMobile() {
     return window.innerWidth < 768
   }

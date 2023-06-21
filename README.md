@@ -72,7 +72,7 @@ Register at <a href="https://vdotok.com" target="_blank">VdoTok</a> to get **Pro
 
 1. Click on this link -> <a href="https://vdotok.com" target="_blank">https://vdotok.com</a> in your browser.
 
-<img width="1721" alt="SignupVdotok" src="https://github.com/vdotok/JS-one2many/assets/134290022/bd6a619a-2a86-4ba1-96a0-8a990e1573bd">
+<img width="1721" alt="SignupVdotok" src="https://github.com/vdotok/JS-one2many/assets/134290022/e3dac74e-e9b0-42ef-aad3-da6985177feb">
 
 2. Click on the "TRY FOR FREE" button, this will navigate to Sign Up page, where the User is required to enter the following information: First Name > Last Name > Email > Country > Password. Select Sign Up For Free button
 

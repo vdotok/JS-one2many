@@ -11,7 +11,7 @@ export class VdkCallService {
     try {
       const user = StorageService.getUserData();
       this.Client = new CVDOTOK.Client({
-        projectId: "1RN1RP",
+        projectId: "178NYR1B",
         host: `${user.media_server_map.complete_address}`,
         stunServer: `${user.stun_server_map.complete_address}`
       });

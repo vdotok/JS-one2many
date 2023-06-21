@@ -123,29 +123,8 @@ Follow the commands below to generate a “build”
   ng build --aot --configuration production --build-optimizer --outputHashing=all
 ```
 
-### How to Configure SDK:
+### Initliaize SDK in your project locally:
 
-Add SDK into your **index.html** file. Declare a variable for your component or service:
-`declare const MVDOTOK: any;`
+See the full documentation of SDK click below.
 
-User provides config to initiate the SDK
-
-```shell
-const Client = new MVDOTOK.Client({
-      projectID: "****",
-      secret: "********************",
-    });
-    Client.on("authenticated", (res) => {
-      let user = StorageService.getUserData();
-      this.Client.Register(user.ref_id.toString(), user.authorization_token.toString());
-    });
-```
-
-After Successful configuation, you can run the projcet locally by using this command.
-
-```shell
-    npm start or
-    ng serve
-```
-
-Now open the browser and you can see the application at http://localhost:4200
+Click on this link -> https://doc.vdotok.com/.

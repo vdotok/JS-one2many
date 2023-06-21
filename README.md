@@ -4,7 +4,7 @@ This is a demo project to demonstrate “One-to-Many Broadcast” using Angular 
 
 ## Live Demo
 
-Click <a href="https://one2many.vdotok.com" target="_blank" title="Chat Demo">here</a> to visit the live demo of VdoTok one-to-many group call.
+Click <a href="https://one2many.vdotok.com" target="_blank" title="One2Many Call Demo">here</a> to visit the live demo of VdoTok one-to-many group call.
 
 ## Prerequisites:
 
@@ -75,7 +75,7 @@ Register at <a href="https://vdotok.com" target="_blank">VdoTok</a> to get **Pro
 
 1. Click on this link -> <a href="https://vdotok.com" target="_blank">https://vdotok.com</a> in your browser.
 
-![My Remote Image](https://user-images.githubusercontent.com/87179594/184070841-f9b91f46-93df-4047-acfb-4739fd207aaa.jpg)
+<img width="1721" alt="SignupVdotok" src="https://github.com/vdotok/JS-one2many/assets/134290022/bd6a619a-2a86-4ba1-96a0-8a990e1573bd">
 
 2. Click on the "TRY FOR FREE" button, this will navigate to Sign Up page, where the User is required to enter the following information: First Name > Last Name > Email > Country > Password. Select Sign Up For Free button
 

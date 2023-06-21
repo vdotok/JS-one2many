@@ -140,4 +140,4 @@ Run the below command to generate a “build”:
 
 To setup audio/video call in your project please follow the detailed documentation here
 
-Click on this link -> <a href = "https://doc.vdotok.com/documentDashboard/audiocall/" target = "_blank"> https://doc.vdotok.com/</a>
+Click on this link -> <a href = "https://doc.vdotok.com/documentDashboard/audiocall/javascript#MsgJsInstallation" target = "_blank"> https://doc.vdotok.com/</a>

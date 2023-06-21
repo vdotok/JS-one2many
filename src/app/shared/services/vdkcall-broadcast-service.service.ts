@@ -1,5 +1,6 @@
 import { Injectable, Output} from "@angular/core";
 import { StorageService } from "./storage.service";
+import { PROJECT_ID } from "src/constants/const";
 declare const CVDOTOK: any;
 
 @Injectable({
@@ -14,7 +15,7 @@ export class VdkcallBroadcastServiceService {
       const user = StorageService.getUserData();
 
       this.Broadcast = new CVDOTOK.Broadcast({
-        projectId: "739GDLR",//"1RN1RP",
+        projectId: PROJECT_ID,
         host: `${user.media_server_map.complete_address}`,
         stunServer: `${user.stun_server_map.complete_address}`,
         ignorePublicIP: true,

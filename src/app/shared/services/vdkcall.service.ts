@@ -21,7 +21,7 @@ export class VdkCallService {
         ignorePublicIP: true
       });
       // this.Broadcast = new CVDOTOK.Broadcast({
-      //   projectId: "1RN1RP",
+      //   projectId: "1KMMRG",
       //   host: `${user.media_server_map.complete_address}`,
       //   stunServer: `${user.stun_server_map.complete_address}`,
       //   ignorePublicIP: true

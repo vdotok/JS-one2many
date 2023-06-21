@@ -22,7 +22,6 @@ We recommend <a href="https://github.com/nvm-sh/nvm" target="_blank">nvm </a> fo
 
 <br/>
 
-
 ## Setting up the local environment
 
 To install Angular on your local system, you need the following:
@@ -59,7 +58,6 @@ You can also visit <a href="https://angular.io/guide/setup-local" target="_blank
     git clone https://github.com/vdotok/JS-one2many.git
 ```
 
-
 - Move from your current directory i-e, **my-proj** to the **JS-one2many** directory
 
 ```shell
@@ -71,7 +69,6 @@ You can also visit <a href="https://angular.io/guide/setup-local" target="_blank
 ## Sign up to get credentials i.e Project ID, and API URL.
 
 Register at <a href="https://vdotok.com" target="_blank">VdoTok</a> to get **Project ID** and **API URL**, by following the below steps:
-
 
 1. Click on this link -> <a href="https://vdotok.com" target="_blank">https://vdotok.com</a> in your browser.
 
@@ -87,7 +84,6 @@ Register at <a href="https://vdotok.com" target="_blank">VdoTok</a> to get **Pro
 
 ![My Remote Image](https://user-images.githubusercontent.com/87179594/184071060-9909513b-f880-4de8-9481-6ab91ae2be95.jpg)
 
-
 <br/>
 
 ## Add PROJECT ID and API URL
@@ -98,17 +94,15 @@ To integrate one-2-many call with JS Call SDK, the user can update the projectID
 
 - Replace the **PROJECT_ID** constant with your project ID.
 
-
 ### Base URL
 
 The user is required to update API-Base-URL with their own base URL. This can be done by following these steps:
 
 - Go to environment.prod.ts file, ( JS-ONE2MANY -> src -> environments -> environment.prod.ts ), and replace the **apiBaseUrl** with your BaseUrl
 
-- Go to environment.ts file, ( JS-ONE2MANY -> src -> environments -> environment.ts ), and replace the **apiBaseUrl** with your  BaseUrl
+- Go to environment.ts file, ( JS-ONE2MANY -> src -> environments -> environment.ts ), and replace the **apiBaseUrl** with your BaseUrl
 
 </br>
-
 
 ## Install npm packages
 
@@ -132,13 +126,18 @@ Please refer to the above-stated npm and nvm version notes.
 
 </br>
 
-
 ## How to Generate Build:
 
-Run the below command to generate a “build”: 
+Run the below command to generate a “build”:
 
 ```shell
   npm run build
 ```
 
 </br>
+
+### Integrate SDK in your project:
+
+To setup audio/video call in your project please follow the detailed documentation here
+
+Click on this link -> <a href = "https://doc.vdotok.com/documentDashboard/audiocall/" target = "_blank"> https://doc.vdotok.com/</a>

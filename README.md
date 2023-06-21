@@ -123,8 +123,8 @@ Follow the commands below to generate a “build”
   ng build --aot --configuration production --build-optimizer --outputHashing=all
 ```
 
-### Initliaize SDK in your project locally:
+### Integrate SDK in your project:
 
-See the full documentation of SDK click below.
+To setup audio/video call in your project please follow the detailed documentation here :
 
-Click on this link -> https://doc.vdotok.com/.
+Click on this link -> <a href="https://doc.vdotok.com/documentDashboard/audiocall/javascript#MsgJsInstallation" target="_blank">https://doc.vdotok.com/</a>

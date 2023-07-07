@@ -95,7 +95,7 @@ export class VdkCallService {
     console.log("GC: AcceptBroadcast Method(): in service", parms);
 
 
-    this.Broadcast.AcceptBroadcast(parms)//this.Client.AcceptBroadcast(parms)
+    this.Client.AcceptBroadcast(parms)//this.Client.AcceptBroadcast(parms)
   }
 
   PulicBroadCast(parms) {

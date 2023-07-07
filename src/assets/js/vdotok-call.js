@@ -2313,7 +2313,7 @@ class Client extends events_1.EventEmitter {
         }
         if (!webRTCPeer) {
             console.error("Unable to find peer connection object", uUID, refId, this.sessionInfo);
-            console.trace();
+            //console.trace();
         }
         return webRTCPeer;
     }
@@ -2384,12 +2384,14 @@ class Client extends events_1.EventEmitter {
         if (!this.broadcastInstance) {
             this.broadcastInstance = new broadcast_1.default(this);
         }
+        this.broadcastInstance.callSession = this.callSession;
         return this.broadcastInstance.AcceptBroadcast(remoteVideo);
     }
     AcceptPublicBroadcast(remoteVideo, sessionID) {
         if (!this.broadcastInstance) {
             this.broadcastInstance = new broadcast_1.default(this);
         }
+        this.broadcastInstance.callSession = this.callSession;
         return this.broadcastInstance.AcceptPublicBroadcast(remoteVideo, sessionID);
     }
 }
@@ -29397,11 +29399,12 @@ class Broadcast extends events_1.EventEmitter {
             },
             onerror: this.onError
         };
-        this.webRtcPeer = WebRtcPeerHelper_1.WebRtcPeerHelper.WebRtcPeerRecvonly(options, (error) => {
+        let webRTCPeer = WebRtcPeerHelper_1.WebRtcPeerHelper.WebRtcPeerRecvonly(options, (error) => {
             if (error) {
                 return console.error(error);
             }
-            this.webRtcPeer.generateOffer((error, offerSdp) => {
+            this.instance.sessionInfo[this.callSession]["participants"][this.currentUser] = { peerConnection: webRTCPeer };
+            webRTCPeer.generateOffer((error, offerSdp) => {
                 this.onOfferIncomingCall(error, offerSdp, from);
             });
         });

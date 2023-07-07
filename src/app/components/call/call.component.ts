@@ -15,7 +15,7 @@ import { VdkcallBroadcastServiceService } from 'src/app/shared/services/vdkcall-
 
 
 // =========== Public Broadcast ===========//
-// => screen share 
+// => screen share
 
 // => camera
 
@@ -97,7 +97,7 @@ export class CallComponent implements OnInit {
       //   selected: false
       // },
       {
-        name: 'screen_sharing_with_app_audio', 
+        name: 'screen_sharing_with_app_audio',
         title: 'screen sharing with app audio',
         selected: false,
       },
@@ -144,9 +144,9 @@ export class CallComponent implements OnInit {
 
   }
 
-  ngOnInit() { 
+  ngOnInit() {
     console.log("**** ngOnInit called\n");
-       
+    
     // this.vcbs.initConfigure();
 
     this.svc.post('AllUsers').subscribe(v => {
@@ -184,7 +184,10 @@ export class CallComponent implements OnInit {
           const displaystyle = response.video_status ? 'block' : 'none';
 
           //if (document.getElementById('remoteVideo') === null) { //if (document.getElementById('remoteVideo'))
+          setTimeout(()=>{
             document.getElementById('remoteVideo').style.display = displaystyle;
+  
+          },300)
 
           console.log("GC CALL_STATUS:\n\n\n ", document.getElementById('remoteVideo') , response, "\n", displaystyle);
 
@@ -210,10 +213,10 @@ export class CallComponent implements OnInit {
           console.error("**** SESSION_BREAK => COUNT = ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid));
           break;
         case "CALL_ENDED":
-          console.error("**** SESSION_CANCEL => COUNT =  ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid)); 
+          console.error("**** SESSION_CANCEL => COUNT =  ", this.vdkCallService.Client.getParticipantsCount(this.public_broadcast_uuid));
           this.public_broadcast_uuid = "";
 
-          break;    
+          break;
       }
     });
 
@@ -411,17 +414,17 @@ export class CallComponent implements OnInit {
   }
   isValidFeatureSelection() {
     /*console.log("selected final result: \n\n",this.broadcastSettings.broadcastType,"\n\n", this.broadcastSettings.features[0].selected, "\n\n", this.broadcastSettings.features[1].selected, "\n\n", this.broadcastSettings.features.filter(e => e.selected), "\n\n\n0or1: ",
-    this.broadcastSettings.broadcastType && 
+    this.broadcastSettings.broadcastType &&
     (this.broadcastSettings.features[0].selected || this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length
     );*/
     
 
     //Previously added condition
-    // return this.broadcastSettings.broadcastType && 
+    // return this.broadcastSettings.broadcastType &&
     // !(this.broadcastSettings.features[0].selected && this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
     
     //Newly added condition
-    return this.broadcastSettings.broadcastType && 
+    return this.broadcastSettings.broadcastType &&
     (this.broadcastSettings.features[0].selected || this.broadcastSettings.features[1].selected) && this.broadcastSettings.features.filter(e => e.selected).length;
   }
   copyText() {
@@ -439,7 +442,7 @@ export class CallComponent implements OnInit {
 
   // ************************************************ ---- PUBLIC BROADCASTING ---- ***********************************************************//
   //PB- Choosing camera with mic OR screen share with audio:
-  selectFeature(i) { 
+  selectFeature(i) {
     // if (i == 0) {
     //   this.broadcastSettings.features[1].selected = false;
     // } else if (i == 1) {
@@ -451,12 +454,12 @@ export class CallComponent implements OnInit {
   }
 
 
-  //PB- When user selects "Public Broadcast" option + click "continue"=> it then shows popup of creating url which calls createURL() 
+  //PB- When user selects "Public Broadcast" option + click "continue"=> it then shows popup of creating url which calls createURL()
   submitFeatures() {
     if (!this.isValidFeatureSelection()) return;
     this.creatingyourURL = false;
     this.StartBroadcast = true;
-  } 
+  }
 
 
   //PB-
